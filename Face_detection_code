@@ -1,0 +1,55 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Feb  1 21:01:35 2022
+
+@author: BHARATH
+"""
+
+# Image Analysis - FaceDetection
+import cv2
+import imutils
+
+# Cascade Classifier will take haarcascade xml file to classify pixels as positive or negative
+face_cascade = cv2.CascadeClassifier("C:/Users/BHARATH/Downloads/haarcascade_frontalface_default.xml")
+eye_cascade = cv2.CascadeClassifier("C:/Users/BHARATH/Downloads/haarcascade_eye.xml")
+
+# Read the Image, 0 = WebCamID
+y =int(input("Enter 0 to read from web cam else any number to read from device:"));
+if(y == 0):
+        vid = cv2.VideoCapture(0)
+else:
+     vid = cv2.VideoCapture("C:/Users/BHARATH/Downloads/videoplayback.webm")
+
+while (1):
+    _, img = vid.read()
+    # Resizing the Image 
+    img = imutils.resize(img, width = 1000) 
+    
+    # convert RGB Image into GrayScale
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    
+    # 1.3 is the threshold value for scale factor, number of neighbouring features.
+    faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+    
+    for (x,y,w,h) in faces:
+        # draw the rectangle on the face using coordinates
+        cv2.rectangle(img, (x,y), (x+w, y+h), (255,255,255), 2)
+        # Face Detection on Gray
+        roi_gray = gray[y:y+h, x:x+w]
+        roi_color = gray[y:y+h, x:x+w]
+        # eyes will provide coordinates of eyes
+        eyes = eye_cascade.detectMultiScale(gray, 1.3, 5)
+        for (ex, ey, ew, eh) in eyes:
+            # draw the rectangle on the face using coordinates
+            cv2.rectangle(img, (ex,ey), (ex+ew, ey+eh), (255,200,50), 2)
+    
+    cv2.imshow('frame', img)
+    
+    # wait for any key 
+    k = cv2.waitKey(1) & 0xFF
+    if k == ord('q') or k == 27:
+        break
+
+vid.release()
+# Close all frames 
+cv2.destroyAllWindows() 
